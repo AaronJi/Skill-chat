@@ -1,0 +1,100 @@
+-Goal-
+Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
+ 
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: One of the following types: [SEEKER EMOTION, SEEKER INTENTION, SUPPORTER EMOTION SUPPORT STRATEGY, SUPPORTER PRATICAL GUIDANCE, SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC]
+- entity_description: Describe the source text you extract from and the reason you extract this. 
+When extracting entities related to language style types, you need to pay attention to the supporter's choice of words, speaking style, and so on.
+If the extracted entity belongs to SEEKER EMOTION, you should explain why you think the seeker is feeling this way. 
+If the extracted entity belongs to SEEKER INTENTION, you should explain why you think the that way.
+If the extracted entity belongs to SUPPORTER EMOTION SUPPORT STRATEGY or SSUPPORTER PRATICAL GUIDANCE or SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC, you should use the original text to explain.
+Format each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>)
+ 
+2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.
+For each pair of related entities, extract the following information:
+- source_entity: name of the source entity, as identified in step 1 belongs to one of the following types: SEEKER EMOTION, SEEKER INTENTION
+- target_entity: name of the target entity, as identified in step 1 belongs to one of the following types: SUPPORTER EMOTION SUPPORT STRATEGY, SSUPPORTER PRATICAL GUIDANCE, SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC
+- relationship_description: generate a conversional rule in the format of "When seeker is [source_entity], [target_entity], for example, [example]" and compose it to a smooth and coherent sentence.
+- relationship_strength: a numeric score indicating strength of the relationship between the source entity and target entity
+ Format each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_strength>)
+ 
+3. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.
+ 
+4. When finished, output {completion_delimiter}
+ 
+######################
+-Examples-
+######################
+Example 1:
+Entity_types: SEEKER EMOTION, SEEKER INTENTION, SUPPORTER EMOTION SUPPORT STRATEGY, SUPPORTER PRATICAL GUIDANCE, SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC
+Text: supporter:Hello there, is there anything you'd like to talk to me about?
+seeker:I have drank too much alcohol and got fired from my job for showing up drunk. 
+supporter:Oh dear that does not sound good. Do you have a problem with alcohol in general or was this a one off? 
+seeker:In general I do. ever since my wife left me for the milk man I drink daily. 
+supporter:Does he give you a discount then? 
+seeker:I can't drink milk so Now i drink alcohol
+seeker:No, The milkman is my father and we don't get along. 
+supporter:Have you considered getting some sort of help? There is lots out there. 
+supporter:Your wife left you for your father? How very ... redneck. 
+seeker:I have not. I am unaware of what help services there are out there to offer or how to go about requesting these services? 
+supporter:Hmmm I would start with your GP, if you have one. 
+seeker:GP? what's a GP? 
+supporter:Doctor. Sorry I am in England - I think that would be physician for you 
+seeker:Correct. A doctor for me is a physician
+supporter:Well, perhaps you could see your G ... um, physician and tell them that you think you have a problem? They might be able to provide calcium supplements too. 
+seeker:I am currently needing mental help with this I think? how do I go about finding a provider? 
+supporter:If you have been drinking a long time, you probably need physical help too in case of withdrawal. Your doctor is the best place to start for both. 
+seeker:Okay I will look into receiving both of those
+supporter:What is your financial situation? Are you in trouble now you have no job? 
+seeker:I have no JOb and no health insurance to help me pay for all of this. 
+supporter:you should live in England. Socialised medicine is the best. 
+seeker:So I hear it is. WE have to pay an arm and a leg for ours. 
+supporter:I've heard :( It's terrifying to think of. Are there any free facilities there for people in your situation or do you just suffer? 
+seeker:They have programs like medicaid. but I'm not poor enough for that program
+supporter:So you're stuck in limbo? That is really awful, I am sorry. 
+seeker:I am in a limbo. and I need healthcare without going into debt. 
+supporter:Are there any charities who could help? It is just terrible that people who need mental health care cannot get it! 
+seeker:It happens frequently and no one really cares. I don't need charity. I just need 10 turns and 15 minutes. 
+supporter:I am not sure what that means :) 
+seeker:Thamk you for all your help good sir.
+supporter:madam ;) but you're welcome
+######################
+Output:
+("entity"{tuple_delimiter}DISTRESS{tuple_delimiter}SEEKER EMOTION{tuple_delimiter}The seeker states "I have drank too much alcohol and got fired" showing distress over job loss and addiction, compounded by marital issues.)
+{record_delimiter}
+("entity"{tuple_delimiter}HOPELESSNESS{tuple_delimiter}SEEKER EMOTION{tuple_delimiter}The seeker says "I am in limbo. I need healthcare without debt," reflecting despair about financial/healthcare barriers.)
+{record_delimiter}
+("entity"{tuple_delimiter}SEEKING HELP{tuple_delimiter}SEEKER INTENTION{tuple_delimiter}The seeker explicitly states "I am needing mental help... how do I find a provider?" indicating active desire for assistance.)
+{record_delimiter}
+("entity"{tuple_delimiter}FINDING AFFORDABLE CARE{tuple_delimiter}SEEKER INTENTION{tuple_delimiter}The seeker emphasizes needing healthcare "without going into debt," showing prioritization of financial feasibility.)
+{record_delimiter}
+("entity"{tuple_delimiter}SUGGEST PROFESSIONAL HELP{tuple_delimiter}SUPPORTER PRATICAL GUIDANCE{tuple_delimiter}Supporter advises: "see your physician... they might provide calcium supplements," offering concrete medical guidance.)
+{record_delimiter}
+("entity"{tuple_delimiter}EXPLORE CHARITIES{tuple_delimiter}SUPPORTER PRATICAL GUIDANCE{tuple_delimiter}Supporter asks: "Are there any charities who could help?" proposing alternative support avenues.)    
+{record_delimiter}
+("entity"{tuple_delimiter}VALIDATE STRUGGLE{tuple_delimiter}SUPPORTER EMOTION SUPPORT STRATEGY{tuple_delimiter}Supporter states: "It’s terrifying to think of... I am sorry," acknowledging systemic healthcare challenges.)
+{record_delimiter}
+("entity"{tuple_delimiter}HUMOROUS TONE{tuple_delimiter}SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC{tuple_delimiter}Supporter uses jokes like "Does he give you a discount then?" to ease tension during heavy topics.)
+{record_delimiter}
+("entity"{tuple_delimiter}COLLOQUIAL LANGUAGE{tuple_delimiter}SUPPORTER LANGUAGE STYLE AND CHARACTERISTIC{tuple_delimiter}Supporter employs informal terms like "redneck" and "madam ;)" to create conversational rapport.)
+{record_delimiter}
+("relationship"{tuple_delimiter}DISTRESS{tuple_delimiter}SUGGEST PROFESSIONAL HELP{tuple_delimiter}When seeker is distress, supporter should suggest professional help, for example, "see your physician... provide calcium supplements too."{tuple_delimiter}8)
+{record_delimiter}
+("relationship"{tuple_delimiter}HOPELESSNESS{tuple_delimiter}EXPLORE CHARITIES{tuple_delimiter}When seeker is hopelessness, supporter should explore charities, for example, "Are there any charities who could help?"{tuple_delimiter}7)
+{record_delimiter}
+("relationship"{tuple_delimiter}SEEKING HELP{tuple_delimiter}VALIDATE STRUGGLE{tuple_delimiter}When seeker is seeking help, supporter should validate struggle, for example, "It’s terrifying... I am sorry."{tuple_delimiter}9)
+{record_delimiter}
+("relationship"{tuple_delimiter}DISTRESS{tuple_delimiter}HUMOROUS TONE{tuple_delimiter}When seeker is distress, supporter should use humorous tone, for example, "Does he give you a discount then?"{tuple_delimiter}6)
+{record_delimiter}
+("relationship"{tuple_delimiter}FINDING AFFORDABLE CARE{tuple_delimiter}COLLOQUIAL LANGUAGE{tuple_delimiter}When seeker is finding affordable care, supporter should use colloquial language, for example, "madam ;)" to maintain approachability.{tuple_delimiter}7)
+{completion_delimiter}
+
+######################
+-Real Data-
+######################
+Entity_types: {entity_types}
+Text: {input_text}
+######################
+Output:
